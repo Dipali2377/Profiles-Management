@@ -37,6 +37,10 @@ app.post("/upload", upload.single("profile"), (req, res) => {
   });
 });
 
+app.get("/", (req, res) => {
+  res.send("Running successfully...");
+});
+
 app.listen(PORT, async () => {
   try {
     await connectDB();

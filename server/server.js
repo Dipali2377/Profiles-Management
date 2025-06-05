@@ -4,6 +4,7 @@ import connectDB from "./config/db.js";
 import profileRouter from "./routes/userRoutes.js";
 import multer from "multer";
 import cors from "cors";
+import path from "path";
 dotenv.config();
 
 const PORT = process.env.PORT || 2020;
@@ -26,6 +27,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+const BASE_IMAGE_URL = "https://profiles-management.onrender.com";
 // upload endpoint
 app.use("/images", express.static("upload/images"));
 

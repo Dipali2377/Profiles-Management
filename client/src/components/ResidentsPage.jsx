@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./ResidentsPage.css";
+// import { toast } from "react-toastify";
 
 const baseURL =
   import.meta.env.VITE_API_BASE_URL ||
@@ -9,6 +10,7 @@ const baseURL =
 const ResidentsPage = () => {
   const [profiles, setProfiles] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -39,6 +41,10 @@ const ResidentsPage = () => {
     }));
   };
 
+  const handleImageChange = (e) => {
+    setImageFile(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -47,12 +53,37 @@ const ResidentsPage = () => {
       !formData.lastname.trim() ||
       !formData.role.trim()
     ) {
-      alert("Please fill in all required fields.");
+      toast.error("Please fill in all required fields.");
       return;
     }
 
     try {
-      await axios.post(`${baseURL}/profiles/addprofile`, formData);
+      let profileData = { ...formData };
+
+      if (imageFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append("profile", imageFile);
+
+        const uploadResponse = await axios.post(
+          `${baseURL}/upload`,
+          uploadFormData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (uploadResponse.data.success) {
+          profileData.image = uploadResponse.data.image_url;
+        } else {
+          toast.error("Image upload failed");
+          return;
+        }
+      }
+
+      await axios.post(`${baseURL}/profiles/addprofile`, profileData);
+      toast.success("Profile added successfully");
       setShowModal(false);
       setFormData({
         firstname: "",
@@ -62,10 +93,11 @@ const ResidentsPage = () => {
         linkedin: "",
         twitter: "",
       });
+      setImageFile(null);
       fetchProfiles();
     } catch (error) {
       console.error("Error adding profile:", error);
-      alert("Failed to add profile. Please try again.");
+      toast.error("Failed to add profile. Please try again.");
     }
   };
 
@@ -162,13 +194,8 @@ const ResidentsPage = () => {
               onChange={handleInputChange}
               required
             />
-            <input
-              type="text"
-              name="image"
-              placeholder="Profile Photo URL"
-              value={formData.image}
-              onChange={handleInputChange}
-            />
+            {/* Replace text input with file input */}
+            <input type="file" accept="image/*" onChange={handleImageChange} />
             <input
               type="url"
               name="linkedin"

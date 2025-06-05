@@ -25,9 +25,7 @@ const getProfiles = async (req, res) => {
   try {
     const profiles = await userModel.find();
 
-    res.status(200).json({
-      profiles,
-    });
+    res.status(200).send(profiles);
   } catch (error) {
     res.status(500).send("Error while getting the profiles");
   }

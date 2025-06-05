@@ -1,11 +1,14 @@
 import { useState } from "react";
 
 import "./App.css";
+import ResidentsPage from "./components/ResidentsPage";
 
 function App() {
   return (
     <>
-      <div></div>
+      <div>
+        <ResidentsPage />
+      </div>
     </>
   );
 }

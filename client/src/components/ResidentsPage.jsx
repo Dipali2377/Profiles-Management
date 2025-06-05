@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./ResidentsPage.css";
 
+const baseURL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://profiles-management.onrender.com/";
+
 const ResidentsPage = () => {
   const [profiles, setProfiles] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -20,9 +24,7 @@ const ResidentsPage = () => {
 
   const fetchProfiles = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:2020/profiles/allprofiles"
-      );
+      const response = await axios.get(`${baseURL}/profiles/allprofiles`);
       setProfiles(response.data);
     } catch (error) {
       console.error("Error fetching profiles:", error);
@@ -50,7 +52,7 @@ const ResidentsPage = () => {
     }
 
     try {
-      await axios.post("http://localhost:2020/profiles/addprofile", formData);
+      await axios.post(`${baseURL}/profiles/addprofile`, formData);
       setShowModal(false);
       setFormData({
         firstname: "",

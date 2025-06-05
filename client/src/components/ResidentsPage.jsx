@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./ResidentsPage.css";
 import { toast } from "react-toastify";
+import dummyImg from "../assets/dummyimg.webp";
 
 const baseURL =
   import.meta.env.VITE_API_BASE_URL ||
@@ -11,6 +12,8 @@ const ResidentsPage = () => {
   const [profiles, setProfiles] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [dataLoaded, setDataLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -31,6 +34,7 @@ const ResidentsPage = () => {
     } catch (error) {
       console.error("Error fetching profiles:", error);
     }
+    setDataLoading(true);
   };
 
   const handleInputChange = (e) => {
@@ -58,6 +62,7 @@ const ResidentsPage = () => {
     }
 
     try {
+      setLoading(true);
       let profileData = { ...formData };
 
       if (imageFile) {
@@ -84,6 +89,7 @@ const ResidentsPage = () => {
 
       await axios.post(`${baseURL}/profiles/addprofile`, profileData);
       toast.success("Profile added successfully");
+      setLoading(false);
       setShowModal(false);
       setFormData({
         firstname: "",
@@ -98,9 +104,17 @@ const ResidentsPage = () => {
     } catch (error) {
       console.error("Error adding profile:", error);
       toast.error("Failed to add profile. Please try again.");
+      setLoading(false);
     }
   };
-
+  if (!dataLoaded) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p className="loading-text">Fetching profiles...</p>
+      </div>
+    );
+  }
   return (
     <div className="residents-container">
       <div className={`profiles-list ${showModal ? "blur" : ""}`}>
@@ -109,11 +123,7 @@ const ResidentsPage = () => {
         {profiles.map((profile) => (
           <div key={profile._id} className="profile-card">
             <img
-              src={
-                profile.image
-                  ? profile.image
-                  : "https://via.placeholder.com/150?text=No+Image"
-              }
+              src={profile.image ? profile.image : dummyImg}
               alt={`${profile.firstname} ${profile.lastname}`}
               className="profile-image"
             />
@@ -219,8 +229,18 @@ const ResidentsPage = () => {
               >
                 Cancel
               </button>
-              <button type="submit" className="modal-btn submit-btn">
-                Add
+              <button
+                type="submit"
+                className="modal-btn submit-btn"
+                disabled={!!loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="add-btn-spinner"></span> Adding Profile
+                  </>
+                ) : (
+                  "Add"
+                )}
               </button>
             </div>
           </form>

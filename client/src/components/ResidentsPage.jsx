@@ -4,7 +4,7 @@ import "./ResidentsPage.css";
 
 const baseURL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://profiles-management.onrender.com/";
+  "https://profiles-management.onrender.com";
 
 const ResidentsPage = () => {
   const [profiles, setProfiles] = useState([]);

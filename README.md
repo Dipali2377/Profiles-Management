@@ -48,3 +48,7 @@ A simple MERN stack application to manage and display resident/user profiles. Us
 git clone https://github.com/Dipali2377/Profiles-Management.git
 cd Profiles-Management
 ```
+
+## Live Demo 🎉
+
+https://profilesmanagement.netlify.app/

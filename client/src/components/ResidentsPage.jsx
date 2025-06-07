@@ -11,7 +11,6 @@ const baseURL =
 const ResidentsPage = () => {
   const [profiles, setProfiles] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dataLoaded, setDataLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -45,10 +44,6 @@ const ResidentsPage = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    setImageFile(e.target.files[0]);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -63,31 +58,8 @@ const ResidentsPage = () => {
 
     try {
       setLoading(true);
-      let profileData = { ...formData };
 
-      if (imageFile) {
-        const uploadFormData = new FormData();
-        uploadFormData.append("profile", imageFile);
-
-        const uploadResponse = await axios.post(
-          `${baseURL}/upload`,
-          uploadFormData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-
-        if (uploadResponse.data.success) {
-          profileData.image = uploadResponse.data.image_url;
-        } else {
-          toast.error("Image upload failed");
-          return;
-        }
-      }
-
-      await axios.post(`${baseURL}/profiles/addprofile`, profileData);
+      await axios.post(`${baseURL}/profiles/addprofile`, formData);
       toast.success("Profile added successfully");
       setLoading(false);
       setShowModal(false);
@@ -99,7 +71,6 @@ const ResidentsPage = () => {
         linkedin: "",
         twitter: "",
       });
-      setImageFile(null);
       fetchProfiles();
     } catch (error) {
       console.error("Error adding profile:", error);
@@ -107,6 +78,7 @@ const ResidentsPage = () => {
       setLoading(false);
     }
   };
+
   if (!dataLoaded) {
     return (
       <div className="loading-container">
@@ -115,6 +87,7 @@ const ResidentsPage = () => {
       </div>
     );
   }
+
   return (
     <div className="residents-container">
       <div className={`profiles-list ${showModal ? "blur" : ""}`}>
@@ -204,8 +177,14 @@ const ResidentsPage = () => {
               onChange={handleInputChange}
               required
             />
-            {/* Replace text input with file input */}
-            <input type="file" accept="image/*" onChange={handleImageChange} />
+
+            <input
+              type="url"
+              name="image"
+              placeholder="Image URL"
+              value={formData.image}
+              onChange={handleInputChange}
+            />
             <input
               type="url"
               name="linkedin"
